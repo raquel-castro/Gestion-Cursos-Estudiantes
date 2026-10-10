@@ -1,0 +1,34 @@
+/* =========================================================
+   DISTRITOS
+========================================================= */
+.page-count-badge {
+    width: 32px;
+    min-width: 32px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #0d6efd;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.distritos-page h1 {
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+
+.distritos-page .table td strong {
+    color: #111827;
+}

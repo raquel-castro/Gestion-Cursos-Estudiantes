@@ -1,0 +1,105 @@
+/* =========================================================
+   DOCENTES
+========================================================= */
+
+.docentes-page {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.docentes-page h1 {
+    font-weight: 700;
+}
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+
+.docentes-page .card {
+    border: none;
+    border-radius: 12px;
+}
+
+/* =========================================================
+   FORMULARIO
+========================================================= */
+
+.docentes-page .form-label {
+    font-weight: 600;
+}
+
+.docentes-page .form-control,
+.docentes-page .form-select {
+    border-radius: 8px;
+}
+
+.docentes-page .form-control:focus,
+.docentes-page .form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.docentes-page .btn {
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.docentes-page .table {
+    margin-bottom: 0;
+}
+
+.docentes-page .table th {
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.docentes-page .table td {
+    vertical-align: middle;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+.page-count-badge {
+    width: 32px;
+    min-width: 32px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #0d6efd;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+
+    .docentes-page {
+        max-width: 100%;
+    }
+
+    .docentes-page h1 {
+        font-size: 1.7rem;
+    }
+
+    .docentes-page .card-body {
+        padding: 1rem;
+    }
+
+}

@@ -1,0 +1,117 @@
+/* =========================================================
+   HEADER GLOBAL
+========================================================= */
+
+.global-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 20px;
+    width: 100%;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   TÍTULO
+========================================================= */
+
+.global-header-title h1 {
+    margin: 0 0 5px;
+
+    color: #183b70;
+
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.global-header-title p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   FECHA Y HORA
+========================================================= */
+
+.global-datetime {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    gap: 5px;
+
+    min-width: 190px;
+
+    padding: 10px 16px;
+
+    background: #ffffff;
+
+    border-radius: 10px;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.global-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #183b70;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.global-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    text-transform: capitalize;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .global-header-title h1 {
+        font-size: 30px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - CELULAR
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .global-header {
+        flex-direction: column;
+    }
+
+    .global-datetime {
+        width: 100%;
+
+        align-items: flex-start;
+
+        box-sizing: border-box;
+    }
+
+}

@@ -1,0 +1,230 @@
+.dashboard-page {
+    width: 100%;
+}
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.dashboard-card {
+    min-height: 135px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 22px;
+    box-sizing: border-box;
+    background: white;
+    border: 1px solid var(--borde);
+    border-left: 5px solid;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card-icon {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 30px;
+}
+
+.dashboard-card span {
+    display: block;
+    margin-bottom: 2px;
+    color: #374151;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.dashboard-card strong {
+    display: block;
+    color: #183b70;
+    font-size: 32px;
+    line-height: 1.2;
+}
+
+.dashboard-card small {
+    color: var(--texto-secundario);
+}
+
+.card-personas {
+    border-left-color: #2563eb;
+}
+
+.card-personas .dashboard-card-icon {
+    background: #dbeafe;
+}
+
+.card-alumnos {
+    border-left-color: #16a34a;
+}
+
+.card-alumnos .dashboard-card-icon {
+    background: #dcfce7;
+}
+
+.card-docentes {
+    border-left-color: #9333ea;
+}
+
+.card-docentes .dashboard-card-icon {
+    background: #f3e8ff;
+}
+
+.card-cursos {
+    border-left-color: #ea580c;
+}
+
+.card-cursos .dashboard-card-icon {
+    background: #ffedd5;
+}
+
+.card-distritos {
+    border-left-color: #0891b2;
+}
+
+.card-distritos .dashboard-card-icon {
+    background: #cffafe;
+}
+
+.card-matriculas {
+    border-left-color: #e11d48;
+}
+
+.card-matriculas .dashboard-card-icon {
+    background: #ffe4e6;
+}
+
+.dashboard-section {
+    margin-bottom: 28px;
+    padding: 24px;
+    box-sizing: border-box;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+}
+
+.dashboard-section h2 {
+    margin: 0 0 5px;
+    color: #183b70;
+}
+
+.dashboard-section > p {
+    margin: 0;
+    color: var(--texto-secundario);
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.quick-actions button {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 7px;
+    background: #183b70;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.quick-actions button:hover {
+    background: #24508f;
+    transform: translateY(-1px);
+}
+
+.activity-section {
+    margin-bottom: 0;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--borde);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #f1f5f9;
+    font-size: 22px;
+}
+
+.activity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+}
+
+.activity-info strong {
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.activity-info span {
+    color: var(--texto-secundario);
+    font-size: 13px;
+}
+
+.activity-time {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+@media (max-width: 1100px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-section {
+        padding: 18px;
+    }
+
+    .activity-item {
+        align-items: flex-start;
+    }
+}

@@ -1,0 +1,123 @@
+/* =========================================================
+   PERSONAS
+========================================================= */
+
+.personas-page {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.personas-page h1 {
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+
+.personas-page .card {
+    border: none;
+    border-radius: 12px;
+}
+
+/* =========================================================
+   FORMULARIO
+========================================================= */
+
+.personas-page .form-label {
+    font-weight: 600;
+}
+
+.personas-page .form-control {
+    border-radius: 8px;
+}
+
+.personas-page .form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.personas-page .btn {
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.personas-page .table {
+    margin-bottom: 0;
+}
+
+.personas-page .table th {
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.personas-page .table td {
+    vertical-align: middle;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+.page-count-badge {
+    width: 32px;
+    min-width: 32px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #0d6efd;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+
+    .personas-page {
+        max-width: 100%;
+    }
+
+    .personas-page h1 {
+        font-size: 1.7rem;
+    }
+
+    .personas-page .card-body {
+        padding: 1rem;
+    }
+
+}
+
+
+.personas-search-input {
+    position: relative;
+}
+
+.personas-search-input i {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.personas-search-input .form-control {
+    padding-left: 34px;
+}

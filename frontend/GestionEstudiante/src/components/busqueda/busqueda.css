@@ -1,0 +1,74 @@
+.busqueda-card {
+    margin-bottom: 20px;
+    padding: 18px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.busqueda-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.busqueda-field label {
+    display: block;
+    margin-bottom: 6px;
+    color: #111827;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.busqueda-input-wrap {
+    position: relative;
+}
+
+.busqueda-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 15px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.busqueda-field input,
+.busqueda-field select {
+    width: 100%;
+    min-height: 38px;
+    padding: 8px 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #fff;
+    color: #111827;
+    outline: none;
+    padding-left: 34px;
+}
+
+.busqueda-field input:focus,
+.busqueda-field select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.busqueda-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+    .busqueda-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .busqueda-grid {
+        grid-template-columns: 1fr;
+    }
+}
