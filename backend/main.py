@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from config.base_datos import Inicializar
-from routers import distritos, personas, alumnos, docentes, cursos, matriculas, logs
+from routers import distritos, personas, alumnos, docentes, cursos, matriculas, logs, auth
 
 app = FastAPI(
     title="Sistema de Gestión de Cursos y Estudiantes",
@@ -32,6 +32,7 @@ app.include_router(docentes.router)
 app.include_router(cursos.router)
 app.include_router(matriculas.router)
 app.include_router(logs.router)
+app.include_router(auth.router)
 
 
 @app.exception_handler(psycopg2.Error)

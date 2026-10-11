@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./login.css";
 import logo from "../../assets/logo_1.png";
-import { ADMIN_USER, ADMIN_PASSWORD } from "../../config/auth";
+import api from "../../api/axios";
 
 import {
     alertaError,
@@ -16,7 +16,7 @@ function Login() {
     const [usuario, setUsuario] = useState("");
     const [contrasena, setContrasena] = useState("");
 
-    const manejarLogin = (e) => {
+    const manejarLogin = async (e) => {
         e.preventDefault();
 
         if (!usuario.trim() || !contrasena) {
@@ -26,31 +26,34 @@ function Login() {
             return;
         }
 
-        if (
-            usuario.trim() !== ADMIN_USER ||
-            contrasena !== ADMIN_PASSWORD
-        ) {
+        try {
+            const response = await api.post("/auth/login", {
+                nombre_usuario: usuario.trim(),
+                contrasena: contrasena
+            });
+
+            sessionStorage.setItem(
+                "sesion",
+                "activa"
+            );
+
+            sessionStorage.setItem(
+                "usuario",
+                response.data.nombre_usuario
+            );
+
+            alertaExito(
+                "Inicio de sesión correcto."
+            );
+
+            navigate("/dashboard");
+
+        } catch (error) {
             alertaError(
+                error.response?.data?.detail ||
                 "Usuario o contraseña incorrectos."
             );
-            return;
         }
-
-        sessionStorage.setItem(
-            "sesion",
-            "activa"
-        );
-
-        sessionStorage.setItem(
-            "usuario",
-            ADMIN_USER
-        );
-
-        alertaExito(
-            "Inicio de sesión correcto."
-        );
-
-        navigate("/dashboard");
     };
 
     return (
