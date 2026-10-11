@@ -1,7 +1,9 @@
 import psycopg2
+
 from config.logger import Logger
 from config.base_datos import obtener_conexion
 from models.persona import Persona
+
 
 # ==========================================
 # EXCEPCIONES
@@ -10,7 +12,6 @@ from models.persona import Persona
 class PersonaNoEncontradaError(Exception):
 
     def __init__(self, persona_id):
-
         super().__init__(
             f"Persona ID={persona_id} no encontrada"
         )
@@ -19,7 +20,6 @@ class PersonaNoEncontradaError(Exception):
 class DNIDuplicadoError(Exception):
 
     def __init__(self, dni):
-
         super().__init__(
             f"DNI '{dni}' ya registrado"
         )
@@ -28,7 +28,6 @@ class DNIDuplicadoError(Exception):
 class CorreoDuplicadoError(Exception):
 
     def __init__(self, correo):
-
         super().__init__(
             f"Correo '{correo}' ya registrado"
         )
@@ -37,7 +36,6 @@ class CorreoDuplicadoError(Exception):
 class PersonaConRegistrosError(Exception):
 
     def __init__(self, persona_id):
-
         super().__init__(
             f"Persona ID={persona_id} no se puede eliminar: "
             f"tiene registros asociados"
@@ -51,9 +49,7 @@ class PersonaConRegistrosError(Exception):
 class PersonaDAO:
 
     def __init__(self):
-
         self.__log = Logger()
-
 
     # ==========================================
     # INSERTAR
@@ -62,11 +58,15 @@ class PersonaDAO:
     def insertar(self, persona):
 
         if self.buscar_por_dni(persona.dni):
-            self.__log.warning(f"DNI duplicado: {persona.dni}")
+            self.__log.warning(
+                f"DNI duplicado: {persona.dni}"
+            )
             raise DNIDuplicadoError(persona.dni)
 
         if persona.correo and self.buscar_por_correo(persona.correo):
-            self.__log.warning(f"Correo duplicado: {persona.correo}")
+            self.__log.warning(
+                f"Correo duplicado: {persona.correo}"
+            )
             raise CorreoDuplicadoError(persona.correo)
 
         conn = obtener_conexion()
@@ -81,20 +81,24 @@ class PersonaDAO:
                     dni,
                     nombres,
                     apellidos,
+                    fecha_nacimiento,
                     telefono,
                     correo,
-                    direccion
+                    direccion,
+                    id_distrito
                 )
-                VALUES (%s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id_persona
                 """,
                 (
                     persona.dni,
                     persona.nombres,
                     persona.apellidos,
+                    persona.fecha_nacimiento,
                     persona.telefono,
                     persona.correo,
-                    persona.direccion
+                    persona.direccion,
+                    persona.id_distrito
                 )
             )
 
@@ -141,8 +145,7 @@ class PersonaDAO:
             f"(ID={persona.id_persona})"
         )
 
-        return persona
-
+        return self.buscar_por_id(persona.id_persona)
 
     # ==========================================
     # BUSCAR POR DNI
@@ -155,9 +158,13 @@ class PersonaDAO:
 
         cursor.execute(
             """
-            SELECT *
-            FROM persona
-            WHERE dni = %s
+            SELECT
+                p.*,
+                d.nombre AS distrito
+            FROM persona p
+            LEFT JOIN distrito d
+                ON p.id_distrito = d.id_distrito
+            WHERE p.dni = %s
             """,
             (
                 dni,
@@ -175,7 +182,6 @@ class PersonaDAO:
             else None
         )
 
-
     # ==========================================
     # BUSCAR POR ID
     # ==========================================
@@ -187,9 +193,13 @@ class PersonaDAO:
 
         cursor.execute(
             """
-            SELECT *
-            FROM persona
-            WHERE id_persona = %s
+            SELECT
+                p.*,
+                d.nombre AS distrito
+            FROM persona p
+            LEFT JOIN distrito d
+                ON p.id_distrito = d.id_distrito
+            WHERE p.id_persona = %s
             """,
             (
                 persona_id,
@@ -207,7 +217,6 @@ class PersonaDAO:
             else None
         )
 
-
     # ==========================================
     # OBTENER TODOS
     # ==========================================
@@ -219,9 +228,13 @@ class PersonaDAO:
 
         cursor.execute(
             """
-            SELECT *
-            FROM persona
-            ORDER BY nombres
+            SELECT
+                p.*,
+                d.nombre AS distrito
+            FROM persona p
+            LEFT JOIN distrito d
+                ON p.id_distrito = d.id_distrito
+            ORDER BY p.nombres, p.apellidos
             """
         )
 
@@ -235,7 +248,6 @@ class PersonaDAO:
             for fila in filas
         ]
 
-
     # ==========================================
     # ACTUALIZAR
     # ==========================================
@@ -246,9 +258,11 @@ class PersonaDAO:
         dni=None,
         nombres=None,
         apellidos=None,
+        fecha_nacimiento=None,
         telefono=None,
         correo=None,
-        direccion=None
+        direccion=None,
+        id_distrito=None
     ):
 
         p = self.buscar_por_id(persona_id)
@@ -282,6 +296,12 @@ class PersonaDAO:
             else p.apellidos
         )
 
+        nueva_fecha_nacimiento = (
+            fecha_nacimiento
+            if fecha_nacimiento is not None
+            else p.fecha_nacimiento
+        )
+
         nuevo_telefono = (
             telefono
             if telefono is not None
@@ -300,14 +320,37 @@ class PersonaDAO:
             else p.direccion
         )
 
-        existente_dni = self.buscar_por_dni(nuevo_dni)
-        if existente_dni and existente_dni.id_persona != persona_id:
-            raise DNIDuplicadoError(nuevo_dni)
+        nuevo_id_distrito = (
+            id_distrito
+            if id_distrito is not None
+            else p.id_distrito
+        )
+
+        existente_dni = self.buscar_por_dni(
+            nuevo_dni
+        )
+
+        if (
+            existente_dni
+            and existente_dni.id_persona != persona_id
+        ):
+            raise DNIDuplicadoError(
+                nuevo_dni
+            )
 
         if nuevo_correo:
-            existente_correo = self.buscar_por_correo(nuevo_correo)
-            if existente_correo and existente_correo.id_persona != persona_id:
-                raise CorreoDuplicadoError(nuevo_correo)
+
+            existente_correo = self.buscar_por_correo(
+                nuevo_correo
+            )
+
+            if (
+                existente_correo
+                and existente_correo.id_persona != persona_id
+            ):
+                raise CorreoDuplicadoError(
+                    nuevo_correo
+                )
 
         conn = obtener_conexion()
         cursor = conn.cursor()
@@ -321,18 +364,22 @@ class PersonaDAO:
                     dni = %s,
                     nombres = %s,
                     apellidos = %s,
+                    fecha_nacimiento = %s,
                     telefono = %s,
                     correo = %s,
-                    direccion = %s
+                    direccion = %s,
+                    id_distrito = %s
                 WHERE id_persona = %s
                 """,
                 (
                     nuevo_dni,
                     nuevo_nombre,
                     nuevo_apellido,
+                    nueva_fecha_nacimiento,
                     nuevo_telefono,
                     nuevo_correo,
                     nueva_direccion,
+                    nuevo_id_distrito,
                     persona_id
                 )
             )
@@ -370,21 +417,13 @@ class PersonaDAO:
             cursor.close()
             conn.close()
 
-        p.dni = nuevo_dni
-        p.nombres = nuevo_nombre
-        p.apellidos = nuevo_apellido
-        p.telefono = nuevo_telefono
-        p.correo = nuevo_correo
-        p.direccion = nueva_direccion
-
         self.__log.info(
             f"Persona actualizada: "
-            f"{p.nombres} {p.apellidos} "
+            f"{nuevo_nombre} {nuevo_apellido} "
             f"(ID={persona_id})"
         )
 
-        return p
-
+        return self.buscar_por_id(persona_id)
 
     # ==========================================
     # ELIMINAR
@@ -447,56 +486,123 @@ class PersonaDAO:
             f"(ID={persona_id})"
         )
 
+    # ==========================================
+    # BUSCAR POR CORREO
+    # ==========================================
+
+    def buscar_por_correo(self, correo):
+
+        if not correo:
+            return None
+
+        conn = obtener_conexion()
+        cursor = conn.cursor()
+
+        try:
+
+            cursor.execute(
+                """
+                SELECT
+                    p.*,
+                    d.nombre AS distrito
+                FROM persona p
+                LEFT JOIN distrito d
+                    ON p.id_distrito = d.id_distrito
+                WHERE LOWER(p.correo) = LOWER(%s)
+                """,
+                (
+                    correo.strip(),
+                )
+            )
+
+            fila = cursor.fetchone()
+
+            return (
+                self.__fila_a_persona(fila)
+                if fila
+                else None
+            )
+
+        finally:
+
+            cursor.close()
+            conn.close()
+
+    # ==========================================
+    # BUSCAR
+    # ==========================================
+
+    def buscar(
+        self,
+        dni=None,
+        nombre=None,
+        apellido=None
+    ):
+
+        conn = obtener_conexion()
+        cursor = conn.cursor()
+
+        try:
+
+            condiciones = []
+            valores = []
+
+            if dni:
+                condiciones.append(
+                    "p.dni = %s"
+                )
+                valores.append(
+                    dni.strip()
+                )
+
+            if nombre:
+                condiciones.append(
+                    "p.nombres ILIKE %s"
+                )
+                valores.append(
+                    f"%{nombre.strip()}%"
+                )
+
+            if apellido:
+                condiciones.append(
+                    "p.apellidos ILIKE %s"
+                )
+                valores.append(
+                    f"%{apellido.strip()}%"
+                )
+
+            if not condiciones:
+                return []
+
+            consulta = f"""
+                SELECT
+                    p.*,
+                    d.nombre AS distrito
+                FROM persona p
+                LEFT JOIN distrito d
+                    ON p.id_distrito = d.id_distrito
+                WHERE {' AND '.join(condiciones)}
+                ORDER BY p.nombres, p.apellidos
+            """
+
+            cursor.execute(
+                consulta,
+                tuple(valores)
+            )
+
+            return [
+                self.__fila_a_persona(fila)
+                for fila in cursor.fetchall()
+            ]
+
+        finally:
+
+            cursor.close()
+            conn.close()
 
     # ==========================================
     # TOTAL
     # ==========================================
-
-
-    def buscar_por_correo(self, correo):
-        if not correo:
-            return None
-        conn = obtener_conexion()
-        cursor = conn.cursor()
-        try:
-            cursor.execute(
-                "SELECT * FROM persona WHERE LOWER(correo) = LOWER(%s)",
-                (correo.strip(),)
-            )
-            fila = cursor.fetchone()
-            return self.__fila_a_persona(fila) if fila else None
-        finally:
-            cursor.close()
-            conn.close()
-
-    def buscar(self, dni=None, nombre=None, apellido=None, correo=None):
-        conn = obtener_conexion()
-        cursor = conn.cursor()
-        try:
-            condiciones = []
-            valores = []
-            if dni:
-                condiciones.append("dni = %s")
-                valores.append(dni.strip())
-            if nombre:
-                condiciones.append("nombres ILIKE %s")
-                valores.append(f"%{nombre.strip()}%")
-            if apellido:
-                condiciones.append("apellidos ILIKE %s")
-                valores.append(f"%{apellido.strip()}%")
-            if correo:
-                condiciones.append("correo ILIKE %s")
-                valores.append(f"%{correo.strip()}%")
-            if not condiciones:
-                return []
-            cursor.execute(
-                f"SELECT * FROM persona WHERE {' AND '.join(condiciones)} ORDER BY nombres, apellidos",
-                tuple(valores)
-            )
-            return [self.__fila_a_persona(fila) for fila in cursor.fetchall()]
-        finally:
-            cursor.close()
-            conn.close()
 
     def total(self):
 
@@ -517,7 +623,6 @@ class PersonaDAO:
 
         return total
 
-
     # ==========================================
     # FILA A PERSONA
     # ==========================================
@@ -525,11 +630,14 @@ class PersonaDAO:
     def __fila_a_persona(self, fila):
 
         return Persona(
-            fila["id_persona"],
-            fila["dni"],
-            fila["nombres"],
-            fila["apellidos"],
-            fila["telefono"],
-            fila["correo"],
-            fila["direccion"]
+            id_persona=fila["id_persona"],
+            dni=fila["dni"],
+            nombres=fila["nombres"],
+            apellidos=fila["apellidos"],
+            telefono=fila["telefono"],
+            correo=fila["correo"],
+            direccion=fila["direccion"],
+            fecha_nacimiento=fila["fecha_nacimiento"],
+            id_distrito=fila["id_distrito"],
+            distrito=fila.get("distrito")
         )

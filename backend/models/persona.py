@@ -1,3 +1,6 @@
+from datetime import date
+
+
 class Persona:
 
     def __init__(
@@ -8,7 +11,10 @@ class Persona:
         apellidos="",
         telefono="",
         correo="",
-        direccion=""
+        direccion="",
+        fecha_nacimiento=None,
+        id_distrito=None,
+        distrito=None
     ):
 
         self.__id_persona = id_persona
@@ -18,6 +24,9 @@ class Persona:
         self.__telefono = telefono
         self.__correo = correo
         self.__direccion = direccion
+        self.__fecha_nacimiento = fecha_nacimiento
+        self.__id_distrito = id_distrito
+        self.__distrito = distrito
 
     @property
     def id_persona(self):
@@ -75,6 +84,54 @@ class Persona:
     def direccion(self, valor):
         self.__direccion = valor
 
+    @property
+    def fecha_nacimiento(self):
+        return self.__fecha_nacimiento
+
+    @fecha_nacimiento.setter
+    def fecha_nacimiento(self, valor):
+        self.__fecha_nacimiento = valor
+
+    @property
+    def id_distrito(self):
+        return self.__id_distrito
+
+    @id_distrito.setter
+    def id_distrito(self, valor):
+        self.__id_distrito = valor
+
+    @property
+    def distrito(self):
+        return self.__distrito
+
+    @distrito.setter
+    def distrito(self, valor):
+        self.__distrito = valor
+
+    @property
+    def edad(self):
+        if not self.__fecha_nacimiento:
+            return None
+
+        fecha = self.__fecha_nacimiento
+
+        if isinstance(fecha, str):
+            try:
+                fecha = date.fromisoformat(fecha)
+            except ValueError:
+                return None
+
+        hoy = date.today()
+
+        return (
+            hoy.year
+            - fecha.year
+            - (
+                (hoy.month, hoy.day)
+                < (fecha.month, fecha.day)
+            )
+        )
+
     def __str__(self):
 
         return (
@@ -83,7 +140,8 @@ class Persona:
             f"{self.__nombres} - "
             f"{self.__apellidos} - "
             f"{self.__correo} - "
-            f"{self.__direccion}"
+            f"{self.__direccion} - "
+            f"{self.__distrito}"
         )
 
     def to_dict(self):
@@ -93,9 +151,13 @@ class Persona:
             "dni": self.__dni,
             "nombres": self.__nombres,
             "apellidos": self.__apellidos,
+            "fecha_nacimiento": self.__fecha_nacimiento,
+            "edad": self.edad,
             "telefono": self.__telefono,
             "correo": self.__correo,
-            "direccion": self.__direccion
+            "direccion": self.__direccion,
+            "id_distrito": self.__id_distrito,
+            "distrito": self.__distrito
         }
 
     @classmethod
@@ -108,5 +170,8 @@ class Persona:
             apellidos=datos.get("apellidos", ""),
             telefono=datos.get("telefono", ""),
             correo=datos.get("correo", ""),
-            direccion=datos.get("direccion", "")
+            direccion=datos.get("direccion", ""),
+            fecha_nacimiento=datos.get("fecha_nacimiento"),
+            id_distrito=datos.get("id_distrito"),
+            distrito=datos.get("distrito")
         )
