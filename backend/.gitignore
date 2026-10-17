@@ -6,6 +6,8 @@ venv/
 env/
 
 .env
+.env.*
+!.env.example
 
 *.db
 *.sqlite
@@ -14,3 +16,7 @@ env/
 .vscode/
 
 *.log
+
+revision_*.txt
+respaldo_cambios.patch
+*.backup

@@ -1,86 +1,62 @@
+
 class Matricula:
 
     def __init__(
         self,
         id_matricula=0,
-        fecha_matricula="",
+        fecha_matricula=None,
         estado="ACTIVO",
         id_alumno=0,
-        id_curso=0
+        id_curso=None,
+        carrera=None,
+        turno=None,
+        ciclo=None,
+        periodo_academico=None,
+        condicion=None
     ):
-
-        self.__id_matricula = id_matricula
-        self.__fecha_matricula = fecha_matricula
-        self.__estado = estado
-        self.__id_alumno = id_alumno
-        self.__id_curso = id_curso
-
-    @property
-    def id_matricula(self):
-        return self.__id_matricula
-
-    @id_matricula.setter
-    def id_matricula(self, valor):
-        self.__id_matricula = valor
-
-    @property
-    def fecha_matricula(self):
-        return self.__fecha_matricula
-
-    @fecha_matricula.setter
-    def fecha_matricula(self, valor):
-        self.__fecha_matricula = valor
-
-    @property
-    def estado(self):
-        return self.__estado
-
-    @estado.setter
-    def estado(self, valor):
-        self.__estado = valor
-
-    @property
-    def id_alumno(self):
-        return self.__id_alumno
-
-    @id_alumno.setter
-    def id_alumno(self, valor):
-        self.__id_alumno = valor
-
-    @property
-    def id_curso(self):
-        return self.__id_curso
-
-    @id_curso.setter
-    def id_curso(self, valor):
-        self.__id_curso = valor
+        self.id_matricula = id_matricula
+        self.fecha_matricula = fecha_matricula
+        self.estado = estado
+        self.id_alumno = id_alumno
+        self.id_curso = id_curso
+        self.carrera = carrera
+        self.turno = turno
+        self.ciclo = ciclo
+        self.periodo_academico = periodo_academico
+        self.condicion = condicion
 
     def __str__(self):
-
         return (
-            f"Matrícula {self.__id_matricula} - "
-            f"{self.__estado} - "
-            f"{self.__id_alumno} - "
-            f"{self.__id_curso}"
+            f"Matrícula {self.id_matricula} - "
+            f"Alumno {self.id_alumno} - "
+            f"Periodo {self.periodo_academico}"
         )
 
     def to_dict(self):
-
         return {
-            "id_matricula": self.__id_matricula,
-            "fecha_matricula": self.__fecha_matricula,
-            "estado": self.__estado,
-            "id_alumno": self.__id_alumno,
-            "id_curso": self.__id_curso
+            "id_matricula": self.id_matricula,
+            "fecha_matricula": self.fecha_matricula,
+            "estado": self.estado,
+            "id_alumno": self.id_alumno,
+            "id_curso": self.id_curso,
+            "carrera": self.carrera,
+            "turno": self.turno,
+            "ciclo": self.ciclo,
+            "periodo_academico": self.periodo_academico,
+            "condicion": self.condicion
         }
 
     @classmethod
     def from_dict(cls, datos):
-
         return cls(
-            datos.get("id_matricula", 0),
-            datos.get("fecha_matricula", ""),
-            datos.get("estado", "ACTIVO"),
-            datos.get("id_alumno", 0),
-            datos.get("id_curso", 0)
+            id_matricula=datos.get("id_matricula", 0),
+            fecha_matricula=datos.get("fecha_matricula"),
+            estado=datos.get("estado", "ACTIVO"),
+            id_alumno=datos.get("id_alumno", 0),
+            id_curso=datos.get("id_curso"),
+            carrera=datos.get("carrera"),
+            turno=datos.get("turno"),
+            ciclo=datos.get("ciclo"),
+            periodo_academico=datos.get("periodo_academico"),
+            condicion=datos.get("condicion")
         )

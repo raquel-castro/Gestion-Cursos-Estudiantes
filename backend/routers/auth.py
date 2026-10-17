@@ -58,6 +58,9 @@ def login(datos: LoginRequest):
             "id_usuario": usuario["id_usuario"],
             "nombre_usuario": usuario["nombre_usuario"]
         }
+    except Exception as error:
+        print("ERROR REAL DEL LOGIN:", repr(error))
+        raise
 
     finally:
         conn.close()

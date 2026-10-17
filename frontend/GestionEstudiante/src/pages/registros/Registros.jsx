@@ -1,286 +1,361 @@
+
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import "./registros.css";
 
 import {
-    alertaExito,
-    alertaError,
-    confirmarAccion
+  alertaExito,
+  alertaError,
+  confirmarAccion
 } from "../../utils/alertas";
 
 const API_URL = "/logs/";
 
 function Historial() {
-    const [logs, setLogs] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [limpiando, setLimpiando] = useState(false);
-    const [busqueda, setBusqueda] = useState("");
+  const [logs, setLogs] = useState([]);
+  const [cargando, setCargando] = useState(false);
+  const [limpiando, setLimpiando] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
 
-    const cargarHistorial = async (termino = busqueda) => {
-        try {
-            setCargando(true);
+  // ==========================================
+  // OBTENER HISTORIAL
+  // ==========================================
 
-            const respuesta = await api.get(API_URL, {
-                params: termino.trim() ? { buscar: termino.trim() } : undefined
-            });
+  const cargarHistorial = async (termino = "") => {
+    try {
+      setCargando(true);
 
-            setLogs(respuesta.data);
+      const texto = String(termino || "").trim();
 
-        } catch (error) {
-            console.error(
-                "Error al obtener historial:",
-                error
-            );
+      const respuesta = await api.get(API_URL, {
+        params: texto ? { buscar: texto } : {}
+      });
 
-            alertaError(
-                error.response?.data?.detail ||
-                "No se pudo obtener el historial desde la API."
-            );
-        } finally {
-            setCargando(false);
-        }
-    };
-
-    useEffect(() => {
-        cargarHistorial();
-    }, []);
-
-    const buscarHistorial = async (e) => {
-        e.preventDefault();
-        await cargarHistorial(busqueda);
-    };
-
-    const limpiarBusqueda = async () => {
-        setBusqueda("");
-        await cargarHistorial("");
-    };
-
-    const limpiarHistorial = async () => {
-        const confirmado = await confirmarAccion(
-            "¿Está seguro de que desea limpiar todo el historial?"
+      if (!Array.isArray(respuesta.data)) {
+        throw new Error(
+          "La API no devolvió una lista de registros."
         );
+      }
 
-        if (!confirmado) return;
+      setLogs(respuesta.data);
 
-        try {
-            setLimpiando(true);
+    } catch (error) {
+      console.error("Error al obtener historial:", error);
 
-            await api.delete(API_URL);
+      const detalle = error.response?.data?.detail;
 
-            setLogs([]);
+      alertaError(
+        typeof detalle === "string"
+          ? detalle
+          : error.message ===
+            "La API no devolvió una lista de registros."
+            ? error.message
+            : "No se pudo obtener el historial desde la API."
+      );
 
-            alertaExito(
-                "Historial eliminado correctamente."
-            );
+    } finally {
+      setCargando(false);
+    }
+  };
 
-        } catch (error) {
-            console.error(
-                "Error al limpiar historial:",
-                error
-            );
+  // ==========================================
+  // CARGAR AL ABRIR LA PÁGINA
+  // ==========================================
 
-            alertaError(
-                error.response?.data?.detail ||
-                "No se pudo limpiar el historial desde la API."
-            );
-        } finally {
-            setLimpiando(false);
-        }
-    };
+  useEffect(() => {
+    cargarHistorial("");
+  }, []);
 
-    const obtenerClaseNivel = (nivel) => {
-        const nivelTexto = String(
-            nivel || ""
-        ).toUpperCase();
+  // ==========================================
+  // BUSCAR HISTORIAL
+  // ==========================================
 
-        if (nivelTexto === "WARNING") {
-            return "historial-level-warning";
-        }
+  const buscarHistorial = async (e) => {
+    e.preventDefault();
+    await cargarHistorial(busqueda);
+  };
 
-        if (nivelTexto === "ERROR") {
-            return "historial-level-error";
-        }
+  // ==========================================
+  // LIMPIAR BÚSQUEDA
+  // ==========================================
 
-        return "historial-level-info";
-    };
+  const limpiarBusqueda = async () => {
+    setBusqueda("");
+    await cargarHistorial("");
+  };
 
-    return (
-        <div className="historial-page">
+  // ==========================================
+  // ACTUALIZAR HISTORIAL
+  // ==========================================
 
-            <div className="historial-header">
-                <div>
-                    <h1>Historial del Sistema</h1>
+  const actualizarHistorial = async () => {
+    await cargarHistorial(busqueda);
+  };
 
-                    <p>
-                        Registro de actividades realizadas en el sistema
-                    </p>
-                </div>
-            </div>
+  // ==========================================
+  // LIMPIAR HISTORIAL
+  // ==========================================
 
-            <div className="historial-card">
+  const limpiarHistorial = async () => {
+    const confirmado = await confirmarAccion(
+      "¿Está seguro de que desea eliminar todo el historial?"
+    );
 
-                <div className="historial-card-header">
+    if (!confirmado) return;
 
-                    <div className="historial-card-title">
-                        <h2>
-                            Eventos registrados
-                        </h2>
+    try {
+      setLimpiando(true);
 
-                        <p>
-                            Actividades generadas por el sistema.
-                        </p>
-                    </div>
+      await api.delete(API_URL);
 
-                    <div className="page-count-badge">
-                        {logs.length}
-                    </div>
+      setLogs([]);
 
-                </div>
+      alertaExito(
+        "Historial eliminado correctamente."
+      );
 
-                <div className="historial-actions">
+    } catch (error) {
+      console.error("Error al limpiar historial:", error);
 
-                    <button
-                        type="button"
-                        className="historial-refresh"
-                        onClick={cargarHistorial}
-                        disabled={cargando}
-                    >
-                        ↻{" "}
-                        {cargando
-                            ? "Actualizando..."
-                            : "Actualizar"}
-                    </button>
+      const detalle = error.response?.data?.detail;
 
-                    <button
-                        type="button"
-                        className="historial-clear"
-                        onClick={limpiarHistorial}
-                        disabled={
-                            limpiando ||
-                            cargando ||
-                            logs.length === 0
-                        }
-                    >
-                        🗑️{" "}
-                        {limpiando
-                            ? "Limpiando..."
-                            : "Limpiar historial"}
-                    </button>
+      alertaError(
+        typeof detalle === "string"
+          ? detalle
+          : "No se pudo limpiar el historial desde la API."
+      );
 
-                </div>
+    } finally {
+      setLimpiando(false);
+    }
+  };
 
-                <form className="historial-search" onSubmit={buscarHistorial}>
-                    <label htmlFor="buscar-historial">Buscar en historial</label>
-                    <div className="historial-search-row">
-                        <div className="historial-search-input">
-                            <i className="bi bi-search" aria-hidden="true"></i>
-                            <input
-                                id="buscar-historial"
-                                type="text"
-                                placeholder="Buscar por hora, nivel o descripción..."
-                                value={busqueda}
-                                onChange={(e) => setBusqueda(e.target.value)}
-                            />
-                        </div>
-                        <button type="submit" className="btn btn-primary" disabled={cargando}>
-                            <i className="bi bi-search"></i> Buscar
-                        </button>
-                        <button type="button" className="btn btn-outline-secondary" onClick={limpiarBusqueda} disabled={cargando}>
-                            Limpiar
-                        </button>
-                    </div>
-                </form>
+  // ==========================================
+  // COLORES SEGÚN NIVEL
+  // ==========================================
 
-                {cargando && (
-                    <div className="historial-empty">
+  const obtenerClaseNivel = (nivel) => {
+    const texto = String(nivel || "").toUpperCase();
 
-                        <div className="historial-empty-icon">
-                            ⏳
-                        </div>
+    if (texto === "WARNING") {
+      return "historial-level-warning";
+    }
 
-                        <p>
-                            Cargando historial...
-                        </p>
+    if (texto === "ERROR") {
+      return "historial-level-error";
+    }
 
-                    </div>
-                )}
+    return "historial-level-info";
+  };
 
-                {!cargando && logs.length === 0 && (
-                    <div className="historial-empty">
+  // ==========================================
+  // INTERFAZ
+  // ==========================================
 
-                        <div className="historial-empty-icon">
-                            📋
-                        </div>
+  return (
+    <div className="historial-page">
 
-                        <p>
-                            No hay eventos registrados todavía.
-                        </p>
+      {/* ENCABEZADO */}
+      <div className="historial-header">
+        <div>
+          <h1>Historial del Sistema</h1>
 
-                    </div>
-                )}
+          <p>
+            Registro de actividades realizadas en el sistema
+          </p>
+        </div>
+      </div>
 
-                {!cargando && logs.length > 0 && (
-                    <div className="historial-table-container">
+      {/* TARJETA PRINCIPAL */}
+      <div className="historial-card">
 
-                        <table className="historial-table">
+        <div className="historial-card-header">
 
-                            <thead>
-                                <tr>
-                                    <th>Hora</th>
-                                    <th>Nivel</th>
-                                    <th>Mensaje</th>
-                                </tr>
-                            </thead>
+          <div className="historial-card-title">
+            <h2>Eventos registrados</h2>
 
-                            <tbody>
-                                {logs
-                                    .slice()
-                                    .reverse()
-                                    .map((log, index) => {
+            <p>
+              Actividades generadas por el sistema.
+            </p>
+          </div>
 
-                                        const nivel =
-                                            String(
-                                                log.nivel ||
-                                                "INFO"
-                                            ).toUpperCase();
-
-                                        return (
-                                            <tr key={index}>
-
-                                                <td className="historial-time">
-                                                    {log.hora}
-                                                </td>
-
-                                                <td>
-                                                    <span
-                                                        className={
-                                                            `historial-level ${obtenerClaseNivel(
-                                                                nivel
-                                                            )}`
-                                                        }
-                                                    >
-                                                        {nivel}
-                                                    </span>
-                                                </td>
-
-                                                <td className="historial-message">
-                                                    {log.msg}
-                                                </td>
-
-                                            </tr>
-                                        );
-                                    })}
-                            </tbody>
-
-                        </table>
-
-                    </div>
-                )}
-
-            </div>
+          <div className="page-count-badge">
+            {logs.length}
+          </div>
 
         </div>
-    );
+
+        {/* BOTONES */}
+        <div className="historial-actions">
+
+          <button
+            type="button"
+            className="historial-refresh"
+            onClick={actualizarHistorial}
+            disabled={cargando || limpiando}
+          >
+            ↻{" "}
+            {cargando
+              ? "Actualizando..."
+              : "Actualizar"}
+          </button>
+
+          <button
+            type="button"
+            className="historial-clear"
+            onClick={limpiarHistorial}
+            disabled={
+              limpiando ||
+              cargando ||
+              logs.length === 0
+            }
+          >
+            🗑️{" "}
+            {limpiando
+              ? "Limpiando..."
+              : "Limpiar historial"}
+          </button>
+
+        </div>
+
+        {/* BUSCADOR */}
+        <form
+          className="historial-search"
+          onSubmit={buscarHistorial}
+        >
+          <label htmlFor="buscar-historial">
+            Buscar en historial
+          </label>
+
+          <div className="historial-search-row">
+
+            <div className="historial-search-input">
+
+              <i
+                className="bi bi-search"
+                aria-hidden="true"
+              />
+
+              <input
+                id="buscar-historial"
+                type="text"
+                placeholder="Buscar por hora, nivel o descripción..."
+                value={busqueda}
+                onChange={(e) =>
+                  setBusqueda(e.target.value)
+                }
+              />
+
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={cargando || limpiando}
+            >
+              <i className="bi bi-search" />
+              {" "}Buscar
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={limpiarBusqueda}
+              disabled={cargando || limpiando}
+            >
+              Limpiar
+            </button>
+
+          </div>
+        </form>
+
+        {/* CARGANDO */}
+        {cargando && (
+          <div className="historial-empty">
+
+            <div className="historial-empty-icon">
+              ⏳
+            </div>
+
+            <p>Cargando historial...</p>
+
+          </div>
+        )}
+
+        {/* SIN RESULTADOS */}
+        {!cargando && logs.length === 0 && (
+          <div className="historial-empty">
+
+            <div className="historial-empty-icon">
+              📋
+            </div>
+
+            <p>
+              No hay eventos registrados todavía.
+            </p>
+
+          </div>
+        )}
+
+        {/* TABLA */}
+        {!cargando && logs.length > 0 && (
+          <div className="historial-table-container">
+
+            <table className="historial-table">
+
+              <thead>
+                <tr>
+                  <th>Hora</th>
+                  <th>Nivel</th>
+                  <th>Mensaje</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {logs
+                  .slice()
+                  .reverse()
+                  .map((log, index) => {
+
+                    const nivel = String(
+                      log.nivel || "INFO"
+                    ).toUpperCase();
+
+                    return (
+                      <tr key={index}>
+
+                        <td className="historial-time">
+                          {log.hora}
+                        </td>
+
+                        <td>
+                          <span
+                            className={
+                              `historial-level ${obtenerClaseNivel(nivel)}`
+                            }
+                          >
+                            {nivel}
+                          </span>
+                        </td>
+
+                        <td className="historial-message">
+                          {log.msg}
+                        </td>
+
+                      </tr>
+                    );
+                  })}
+
+              </tbody>
+            </table>
+
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
 }
 
 export default Historial;
